@@ -504,6 +504,9 @@ class DependencyAnalysisPlugin : Plugin<Project> {
         outputPretty.set(outputPaths.artifactsPrettyPath)
       }
 
+    // TODO breadcrumb: consider creating a ClassVisitorPreProcessingTask that takes `artifactsReportTask.flatMap { it.output }` as an input
+    // and outputs the data needed by DependencyReportTask and ConstantUsageDetectionTask
+
     // Produces a report that lists all dependencies, whether or not they're transitive, and
     // associated with the classes they contain.
     val dependencyReportTask =
@@ -516,7 +519,7 @@ class DependencyAnalysisPlugin : Plugin<Project> {
           }.artifacts.artifactFiles
         )
 
-        allArtifacts.set(artifactsReportTask.flatMap { it.output })
+        allArtifacts.set(artifactsReportTask.flatMap { it.output }) // TODO breadcrumb: same input as constantTask
 
         allComponentsReport.set(outputPaths.allDeclaredDepsPath)
         allComponentsReportPretty.set(outputPaths.allDeclaredDepsPrettyPath)
@@ -548,7 +551,7 @@ class DependencyAnalysisPlugin : Plugin<Project> {
     // project.
     val constantTask =
       tasks.register<ConstantUsageDetectionTask>("constantUsageDetector$variantTaskName") {
-        artifacts.set(artifactsReportTask.flatMap { it.output })
+        artifacts.set(artifactsReportTask.flatMap { it.output }) // TODO breadcrumb: same input as dependencyReportTask
         imports.set(importFinderTask.flatMap { it.importsReport })
         constantUsageReport.set(outputPaths.constantUsagePath)
 
